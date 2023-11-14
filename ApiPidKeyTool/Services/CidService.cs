@@ -52,7 +52,9 @@ public class CidService
 
         if (errorElement != null)
         {
+            Console.WriteLine($"Error Element Found: {errorElement}");
             string errorCode = errorElement.Element("ErrorCode")?.Value;
+            Console.WriteLine($"Error errorCode Found: {errorCode}");
             return ErrorCodeToMessage(errorCode);
         }
 
