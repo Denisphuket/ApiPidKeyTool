@@ -2,6 +2,8 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
+using System.Xml.Linq;
+using System.Linq;
 
 public class CidService
 {
@@ -32,7 +34,50 @@ public class CidService
         response.EnsureSuccessStatusCode();
 
         string responseContent = await response.Content.ReadAsStringAsync();
-        return responseContent; // Здесь может быть дополнительная обработка XML ответа
+        return ParseResponse(responseContent); // Здесь может быть дополнительная обработка XML ответа
+    }
+
+    private string ParseResponse(string response)
+    {
+        var soapEnvelope = XElement.Parse(response);
+        var responseXml = soapEnvelope.Descendants().FirstOrDefault(x => x.Name.LocalName == "ResponseXml")?.Value;
+
+        if (string.IsNullOrEmpty(responseXml))
+        {
+            return "Ответ не содержит данных";
+        }
+
+        var activationResponse = XElement.Parse(responseXml);
+        var errorElement = activationResponse.Descendants().FirstOrDefault(x => x.Name.LocalName == "ErrorInfo");
+
+        if (errorElement != null)
+        {
+            string errorCode = errorElement.Element("ErrorCode")?.Value;
+            return ErrorCodeToMessage(errorCode);
+        }
+
+        var cidElement = activationResponse.Descendants().FirstOrDefault(x => x.Name.LocalName == "CID");
+        return cidElement?.Value ?? "CID не найден";
+    }
+
+    private string ErrorCodeToMessage(string errorCode)
+    {
+        return errorCode switch
+        {
+            "0x7F" => "Необходимо звонить",
+            "0x67" => "Ключ заблокирован",
+            "0x8D" => "Превышено количество IID",
+            "0x90" => "Неверный IID",
+            "0x68" => "Ключ не легитимен",
+            "0xD5" => "IID заблокирован",
+            "0xD6" => "IID заблокирован",
+            "0x86" => "-1",
+            "0x71" => "0x71",
+            "0x8E" => "0x71",
+            "0xC004C017" => "0xC004C017",
+            "0x80131509" => "0xC004C017",
+            _ => $"Неизвестная ошибка: {errorCode}"
+        };
     }
 
     private string CreateSoapRequest(string installationId, string extendedProductId)
