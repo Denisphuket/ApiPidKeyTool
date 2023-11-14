@@ -48,12 +48,13 @@ public class CidService
         }
 
         var activationResponse = XElement.Parse(responseXml);
-        var errorElement = activationResponse.Descendants().FirstOrDefault(x => x.Name.LocalName == "ErrorInfo");
+        XNamespace ns = "http://www.microsoft.com/DRM/SL/BatchActivationResponse/1.0";
+        var errorElement = activationResponse.Descendants(ns + "ErrorInfo").FirstOrDefault();
 
         if (errorElement != null)
         {
             Console.WriteLine($"Error Element Found: {errorElement}");
-            string errorCode = errorElement.Element("ErrorCode")?.Value;
+            string errorCode = errorElement.Element(ns + "ErrorCode")?.Value;
             Console.WriteLine($"Error errorCode Found: {errorCode}");
             return ErrorCodeToMessage(errorCode);
         }
