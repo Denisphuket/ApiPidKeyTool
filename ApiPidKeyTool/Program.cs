@@ -12,7 +12,9 @@ builder.Services.AddControllers();
 // Настройка Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.WebHost.UseUrls("https://localhost:7182", "http://localhost:7183");
+builder.WebHost.UseUrls("https://localhost:7181", "http://localhost:7182");
+//builder.WebHost.UseUrls("http://*:7183");
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo 
@@ -32,7 +34,7 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 // Конфигурация HTTP request pipeline
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
