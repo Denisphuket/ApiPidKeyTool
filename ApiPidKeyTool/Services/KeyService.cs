@@ -1,4 +1,6 @@
+using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -7,7 +9,12 @@ public class KeyService
 {
     public async Task<List<KeyResponse>> CheckKeysAsync(string keys)
     {
-        string exePath = "PidKey.exe"; // Путь к PidKey.exe
+        string exePath = Path.Combine(Path.GetTempPath(), "PidKey.exe");
+
+        // Извлечение PidKey.exe из ресурсов и сохранение во временном файле
+        byte[] exeBytes = ApiPidKeyTool.Properties.Resources.PidKey;
+        File.WriteAllBytes(exePath, exeBytes);
+
         string output = "";
 
         using (Process process = new Process())
@@ -33,10 +40,13 @@ public class KeyService
             }
         }
 
+        // Удаление временного файла PidKey.exe после использования
+        File.Delete(exePath);
+
         return ParseKeyOutput(output);
     }
 
-   private List<KeyResponse> ParseKeyOutput(string output)
+    private List<KeyResponse> ParseKeyOutput(string output)
     {
         var responses = new List<KeyResponse>();
         var jsonResponses = output.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
@@ -72,5 +82,4 @@ public class KeyService
 
         return responses;
     }
-
 }
