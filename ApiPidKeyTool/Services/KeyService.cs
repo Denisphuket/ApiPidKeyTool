@@ -1,9 +1,11 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Text.Json;
 
 public class KeyService
 {
-    public async Task<string> CheckKeyAsync(string key)
+    public async Task<List<KeyResponse>> CheckKeysAsync(string keys)
     {
         string exePath = "PidKey.exe"; // Путь к PidKey.exe
         string output = "";
@@ -13,7 +15,7 @@ public class KeyService
             process.StartInfo = new ProcessStartInfo
             {
                 FileName = "cmd.exe",
-                Arguments = $"/c {exePath} /CheckKey {key}",
+                Arguments = $"/c {exePath} /CheckKey {keys}",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -21,7 +23,6 @@ public class KeyService
             };
 
             process.Start();
-
             output = await process.StandardOutput.ReadToEndAsync();
             string errorOutput = await process.StandardError.ReadToEndAsync();
             process.WaitForExit();
@@ -32,6 +33,44 @@ public class KeyService
             }
         }
 
-        return output;
+        return ParseKeyOutput(output);
     }
+
+   private List<KeyResponse> ParseKeyOutput(string output)
+    {
+        var responses = new List<KeyResponse>();
+        var jsonResponses = output.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (var jsonResponse in jsonResponses)
+        {
+            try
+            {
+                var response = JsonSerializer.Deserialize<KeyResponse>(jsonResponse);
+                if (response != null)
+                {
+                    responses.Add(response);
+                }
+                else
+                {
+                    // Добавление объекта с пустыми/умолчательными значениями
+                    responses.Add(new KeyResponse
+                    {
+                        Key = "",
+                        Description = "",
+                        Remain = "0",
+                        ErrorCode = "Не удалось обработать ключ",
+                        IID = ""
+                    });
+                }
+            }
+            catch (JsonException ex)
+            {
+                // Обработка ошибок парсинга JSON
+                Console.WriteLine($"Ошибка парсинга: {ex}");
+            }
+        }
+
+        return responses;
+    }
+
 }

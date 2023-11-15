@@ -1,4 +1,4 @@
 public class KeyRequest
 {
-    public string? Key { get; set; }
+    public string? Keys { get; set; }
 }

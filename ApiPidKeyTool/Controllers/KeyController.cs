@@ -12,13 +12,13 @@ public class KeyController : ControllerBase
         _keyService = keyService;
     }
 
-    [HttpPost]
-    public async Task<IActionResult> CheckKey([FromBody] KeyRequest keyRequest)
+    [HttpGet]
+    public async Task<IActionResult> CheckKeys([FromQuery] string keys)
     {
         try
         {
-            var result = await _keyService.CheckKeyAsync(keyRequest.Key);
-            return Ok(result);
+            var responses = await _keyService.CheckKeysAsync(keys);
+            return Ok(responses);
         }
         catch (Exception ex)
         {
