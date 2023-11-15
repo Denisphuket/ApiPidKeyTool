@@ -1,3 +1,5 @@
+using Microsoft.OpenApi.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Добавление сервисов
@@ -11,6 +13,21 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.WebHost.UseUrls("https://localhost:7182", "http://localhost:7183");
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo 
+    { 
+        Title = "ApiPidKeyTool", 
+        Version = "v1.0.0",
+        Description = "Этот проект - API, созданный для проверки ключей продуктов с использованием внешнего инструмента `PidKey.exe`. API позволяет пользователям отправлять ключи продуктов и получать информацию о их статусе и другие детали.",
+        Contact = new OpenApiContact
+        {
+            Name = "DenisPhuket",
+            Url = new Uri("https://github.com/Denisphuket/ApiPidKeyTool"),
+        },
+    });
+});
+
 
 var app = builder.Build();
 
