@@ -69,12 +69,20 @@ public class CidService
         var cidElement = activationResponse.Descendants().FirstOrDefault(x => x.Name.LocalName == "CID");
         if (cidElement != null)
         {
-            return cidElement.Value;
+            return FormatCid(cidElement.Value);
         }
         else
         {
             return "CID не найден";
         }
+    }
+
+    private string FormatCid(string cid)
+    {
+        // Предполагая, что CID всегда имеет длину, кратную 6
+        var parts = Enumerable.Range(0, cid.Length / 6)
+                            .Select(i => cid.Substring(i * 6, 6));
+        return string.Join("-", parts);
     }
 
 
