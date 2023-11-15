@@ -10,6 +10,7 @@ builder.Services.AddControllers();
 // Настройка Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.WebHost.UseUrls("https://localhost:7182", "http://localhost:7183");
 
 var app = builder.Build();
 
