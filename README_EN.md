@@ -15,13 +15,13 @@ The API runs `PidKey.exe` with the provided product keys and returns a formatted
 
 To use the API, users can send GET requests to the following endpoints:
 
-- `/check-keys?keys=<key1>,<key2>,...`: This endpoint accepts one or more keys separated by commas and returns information about each key.
-- `/get-cid?installationId=<installationId>`: This endpoint accepts an installation ID and returns the corresponding CID.
+- `/Key?keys=<key1>,<key2>,...`: This endpoint accepts one or more keys separated by commas and returns information about each key.
+- `/Cid?installationId=<installationId>`: This endpoint accepts an installation ID and returns the corresponding CID.
 
 ## Endpoints
 
-- `GET /check-keys`: Accepts a string of keys and returns information about each key.
-- `GET /get-cid`: Accepts an installation ID and returns CID.
+- `GET /Key`: Accepts a string of keys and returns information about each key.
+- `GET /Cid`: Accepts an installation ID and returns CID.
 
 ## Acknowledgements
 
