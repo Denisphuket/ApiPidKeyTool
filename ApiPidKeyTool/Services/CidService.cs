@@ -53,13 +53,30 @@ public class CidService
 
         if (errorElement != null)
         {
-            string errorCode = errorElement.Element(ns + "ErrorCode")?.Value;
-            return ErrorCodeToMessage(errorCode);
+            // Используем безопасный вызов метода Element и оператор ?. для извлечения значения
+            var errorCode = errorElement.Element(ns + "ErrorCode")?.Value;
+            if (!string.IsNullOrEmpty(errorCode))
+            {
+                return ErrorCodeToMessage(errorCode);
+            }
+            else
+            {
+                return "Код ошибки не найден";
+            }
         }
 
+        // Используем безопасный вызов метода Descendants и оператор ?. для извлечения значения
         var cidElement = activationResponse.Descendants().FirstOrDefault(x => x.Name.LocalName == "CID");
-        return cidElement?.Value ?? "CID не найден";
+        if (cidElement != null)
+        {
+            return cidElement.Value;
+        }
+        else
+        {
+            return "CID не найден";
+        }
     }
+
 
     private string ErrorCodeToMessage(string errorCode)
     {
